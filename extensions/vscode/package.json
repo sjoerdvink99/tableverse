@@ -1,0 +1,122 @@
+{
+  "name": "tableverse",
+  "displayName": "Tableverse",
+  "description": "High-performance tile-based table viewer for Parquet, CSV, and Arrow files",
+  "version": "0.1.0",
+  "publisher": "tableverse",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sjoerdvink99/tableverse"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Data Science",
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "parquet",
+    "csv",
+    "arrow",
+    "dataframe",
+    "table",
+    "data engineering",
+    "ml"
+  ],
+  "activationEvents": [
+    "onCommand:tableverse.openFile",
+    "onCustomEditor:tableverse.parquetViewer"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tableverse.openFile",
+        "title": "Open with Tableverse",
+        "category": "Tableverse",
+        "icon": "$(table)"
+      },
+      {
+        "command": "tableverse.openUri",
+        "title": "Open URI in Tableverse",
+        "category": "Tableverse"
+      },
+      {
+        "command": "tableverse.stopServer",
+        "title": "Stop Tableverse Server",
+        "category": "Tableverse"
+      },
+      {
+        "command": "tableverse.showSources",
+        "title": "Show Active Sources",
+        "category": "Tableverse"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "tableverse.openFile",
+          "when": "resourceExtname == .parquet || resourceExtname == .arrow || resourceExtname == .feather || resourceExtname == .ipc || resourceExtname == .csv",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "tableverse.openFile",
+          "when": "resourceExtname == .parquet || resourceExtname == .arrow || resourceExtname == .csv",
+          "group": "navigation"
+        }
+      ]
+    },
+    "customEditors": [
+      {
+        "viewType": "tableverse.parquetViewer",
+        "displayName": "Tableverse Viewer",
+        "selector": [
+          { "filenamePattern": "*.parquet" },
+          { "filenamePattern": "*.arrow" },
+          { "filenamePattern": "*.feather" },
+          { "filenamePattern": "*.ipc" }
+        ],
+        "priority": "option"
+      }
+    ],
+    "configuration": {
+      "title": "Tableverse",
+      "properties": {
+        "tableverse.serverPort": {
+          "type": "number",
+          "default": 8080,
+          "description": "Port for the Tableverse server"
+        },
+        "tableverse.binaryPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the tableverse binary (leave empty to auto-detect)"
+        },
+        "tableverse.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start the Tableverse server when opening a file"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0"
+  },
+  "dependencies": {}
+}

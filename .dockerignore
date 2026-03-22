@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+
+# Development files
+.env
+.env.local
+.vscode/
+.idea/
+
+# Build artifacts
+target/
+dist/
+node_modules/
+
+# Examples and test data
+examples/data/
+examples/tiles/
+
+# Logs
+*.log
+logs/
+
+# MinIO data
+.minio-data/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~

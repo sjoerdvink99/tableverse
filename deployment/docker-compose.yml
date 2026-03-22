@@ -1,0 +1,12 @@
+services:
+  tableverse:
+    image: ${TABLEVERSE_IMAGE:-ghcr.io/sjoerdvink99/tableverse:latest}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ${DATA_DIR:-../data}:/data:ro
+    command: ["/data/${SOURCE_FILE:-source.parquet}"]
+    ports:
+      - "${PORT:-8080}:8080"
+    restart: unless-stopped

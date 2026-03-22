@@ -1,0 +1,38 @@
+[package]
+name = "tv-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tv-core = { path = "../tv-core" }
+tv-integrations = { path = "../tv-integrations" }
+arrow = { workspace = true }
+arrow-csv = { workspace = true }
+arrow-json = { workspace = true }
+parquet = { workspace = true }
+object_store = { workspace = true }
+url = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+tokio = { workspace = true }
+toml = { workspace = true }
+dirs = { workspace = true }
+glob = { workspace = true }
+futures = { workspace = true }
+bytes = "1"
+rayon = "1"
+
+[dev-dependencies]
+tempfile = { workspace = true }
+approx = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+criterion = { workspace = true }
+
+[[bench]]
+name = "engine_benches"
+harness = false

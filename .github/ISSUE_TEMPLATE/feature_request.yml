@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest an improvement or new capability
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the workflow or pain point you are running into.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you have considered
+      description: Other tools, workarounds, or approaches you have tried.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Grid rendering / zoom
+        - Filtering / sorting / pipeline
+        - Column statistics
+        - Navigation / minimap
+        - Python package
+        - CLI
+        - Docker / deployment
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: scale
+    attributes:
+      label: Typical dataset size
+      placeholder: "e.g. 500M rows × 50 cols, Parquet on S3"

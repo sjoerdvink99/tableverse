@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "tableverse"
+version = "0.1.0"
+description = "High-performance tile-based table viewer for ML and data engineers"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Sjoerd Vink", email = "sjoerdvink99@gmail.com"}
+]
+keywords = ["dataframe", "parquet", "visualization", "arrow", "table"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "pyarrow>=14",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dagster = ["dagster>=1.5"]
+airflow = ["apache-airflow>=2.7"]
+mlflow = ["mlflow>=2.8"]
+dvc = ["dvc>=3.30"]
+wandb = ["wandb>=0.16"]
+spark = ["pyspark>=3.4"]
+great_expectations = ["great-expectations>=0.18"]
+all = [
+    "dagster>=1.5",
+    "apache-airflow>=2.7",
+    "mlflow>=2.8",
+    "dvc>=3.30",
+    "wandb>=0.16",
+    "pyspark>=3.4",
+    "great-expectations>=0.18",
+]
+
+[project.urls]
+Homepage = "https://tableverse.io"
+Repository = "https://github.com/sjoerdvink99/tableverse"
+"Bug Tracker" = "https://github.com/sjoerdvink99/tableverse/issues"
+
+[project.scripts]
+tableverse = "tableverse.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tableverse*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pyright]
+pythonVersion = "3.9"
+strict = true

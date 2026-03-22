@@ -1,0 +1,23 @@
+[package]
+name = "tv-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "tableverse"
+path = "src/main.rs"
+
+[dependencies]
+tv-core = { path = "../tv-core" }
+tv-engine = { path = "../tv-engine" }
+tv-server = { path = "../tv-server" }
+tv-flight = { path = "../tv-flight" }
+clap = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+open = { workspace = true }
+anyhow = { workspace = true }
+serde_json = { workspace = true }
+arrow = { workspace = true }

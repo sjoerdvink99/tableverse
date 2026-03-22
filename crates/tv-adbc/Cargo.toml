@@ -1,0 +1,19 @@
+[package]
+name = "tv-adbc"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+tv-core = { path = "../tv-core" }
+tv-engine = { path = "../tv-engine" }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+arrow = { workspace = true }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+url = { workspace = true }
+bytes = "1"

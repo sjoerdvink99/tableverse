@@ -1,0 +1,7 @@
+dist/
+*.egg-info/
+.maturin/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
