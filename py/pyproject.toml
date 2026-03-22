@@ -1,0 +1,45 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "tableverse"
+version = "0.1.0"
+description = "High-performance tile-based table viewer for massive datasets"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = ["parquet", "dataframe", "table-viewer", "arrow", "data-engineering"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "pyarrow", "maturin"]
+
+[project.scripts]
+tv = "tableverse._cli:main"
+
+[project.urls]
+Homepage = "https://github.com/sjoerdvink99/tableverse"
+Repository = "https://github.com/sjoerdvink99/tableverse"
+Issues = "https://github.com/sjoerdvink99/tableverse/issues"
+
+[tool.maturin]
+bindings = "bin"
+manifest-path = "../crates/tv-cli/Cargo.toml"
+python-source = "."
+strip = true
+include = [{ path = "tableverse/py.typed", format = "wheel" }]

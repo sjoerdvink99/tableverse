@@ -1,0 +1,228 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            use_cross: true
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            use_cross: true
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            use_cross: false
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            use_cross: false
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            use_cross: false
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install cross
+        if: matrix.use_cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+      - name: Build frontend
+        run: |
+          cd web
+          npm install -g bun || true
+          bun install
+          bun run build
+        shell: bash
+      - name: Build binary
+        run: |
+          if [ "${{ matrix.use_cross }}" = "true" ]; then
+            cross build --release --target ${{ matrix.target }} -p tv-cli
+          else
+            cargo build --release --target ${{ matrix.target }} -p tv-cli
+          fi
+        shell: bash
+      - name: Package binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          BIN=target/${{ matrix.target }}/release/tableverse
+          ARCHIVE=tableverse-${VERSION}-${{ matrix.target }}.tar.gz
+          tar czf $ARCHIVE -C $(dirname $BIN) $(basename $BIN)
+          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
+        shell: bash
+      - name: Package binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $VERSION = $env:GITHUB_REF -replace 'refs/tags/', ''
+          $BIN = "target\${{ matrix.target }}\release\tableverse.exe"
+          $ARCHIVE = "tableverse-$VERSION-${{ matrix.target }}.zip"
+          Compress-Archive -Path $BIN -DestinationPath $ARCHIVE
+          echo "ARCHIVE=$ARCHIVE" | Out-File -FilePath $env:GITHUB_ENV -Append
+        shell: pwsh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tableverse-${{ matrix.target }}
+          path: ${{ env.ARCHIVE }}
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Checksums
+        run: sha256sum artifacts/* > checksums.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*
+            checksums.txt
+          generate_release_notes: true
+
+  docker:
+    name: Docker ${{ matrix.platform }}
+    needs: release
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sanitize platform tag
+        id: ptag
+        run: echo "tag=$(echo '${{ matrix.platform }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}-${{ steps.ptag.outputs.tag }}
+
+  docker-manifest:
+    name: Docker manifest
+    needs: docker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create and push multi-arch manifest
+        run: |
+          docker buildx imagetools create \
+            --tag ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
+            --tag ghcr.io/${{ github.repository }}:latest \
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}-linux-amd64 \
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}-linux-arm64
+
+  python-sdist:
+    name: Python sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: PyO3/maturin-action@v1
+        with:
+          working-directory: py
+          command: sdist
+          args: --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-sdist
+          path: py/dist/*.tar.gz
+
+  python-wheels:
+    name: Python wheel (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            manylinux: auto
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            manylinux: auto
+          - os: macos-13
+            target: x86_64-apple-darwin
+            manylinux: ''
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            manylinux: ''
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            manylinux: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Build frontend
+        run: cd web && bun install && bun run build
+        shell: bash
+      - uses: PyO3/maturin-action@v1
+        with:
+          working-directory: py
+          target: ${{ matrix.target }}
+          args: --release --out dist
+          manylinux: ${{ matrix.manylinux || 'off' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.target }}
+          path: py/dist/*.whl
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [python-wheels, python-sdist, release]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheel-*
+          path: wheels
+          merge-multiple: true
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: wheels

@@ -1,0 +1,61 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/tv-core",
+  "crates/tv-engine",
+  "crates/tv-server",
+  "crates/tv-cli",
+  "crates/tv-bench",
+]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+authors = ["Sjoerd Vink <sjoerdvink99@gmail.com>"]
+license = "MIT"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = 3
+
+[profile.dev]
+debug = false
+split-debuginfo = "off"
+incremental = true
+
+[profile.dev.package."*"]
+opt-level = 0
+debug = false
+
+[workspace.dependencies]
+anyhow = "1"
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+axum = { version = "0.8", features = ["http2"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "sync"] }
+clap = { version = "4", features = ["derive", "env"] }
+tower-http = { version = "0.6", features = ["cors", "fs", "trace"] }
+arrow = { version = "55", features = ["ipc_compression"] }
+arrow-csv = "55"
+arrow-json = "55"
+parquet = { version = "55", features = ["async", "object_store"] }
+object_store = { version = "0.12", features = ["aws", "gcp", "azure", "http"] }
+url = "2"
+regex = "1"
+rust-embed = { version = "8", features = ["mime-guess", "compression"] }
+open = "5"
+uuid = { version = "1", features = ["v4"] }
+base64 = "0.22"
+toml = "0.8"
+dirs = "5"
+glob = "0.3"
+futures = "0.3"
+tempfile = "3"
+approx = "0.5"
+criterion = { version = "0.5", features = ["html_reports"] }
+dashmap = "6"

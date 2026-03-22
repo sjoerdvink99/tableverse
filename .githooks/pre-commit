@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+export PATH="$HOME/.cargo/bin:$HOME/.bun/bin:$PATH"
+
+cargo fmt --all -- --check
+cargo clippy --all -- -D warnings
+cargo test --all
+
+(cd web && bun run type-check)
+
+python3 -m py_compile py/tableverse/__init__.py py/tableverse/_cli.py py/tableverse/magic.py

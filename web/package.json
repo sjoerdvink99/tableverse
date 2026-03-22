@@ -1,0 +1,46 @@
+{
+  "name": "tableverse-web",
+  "version": "1.0.0",
+  "description": "Tableverse frontend - tile-based viewer for massive tabular data",
+  "private": true,
+  "type": "module",
+  "author": "Tableverse Contributors",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "bun test",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "apache-arrow": "^21.1.0",
+    "immer": "^11.1.4",
+    "react": "^19",
+    "react-dom": "^19",
+    "vega": "^5",
+    "vega-embed": "^6",
+    "vega-lite": "^5",
+    "zustand": "^5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.0.0",
+    "vite": "^8.0.1",
+    "vitest": "^3"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}
